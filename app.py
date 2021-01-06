@@ -5,7 +5,7 @@ import streamlit as st
 import os
 import time
 
-st.title("PhotoMath")
+st.title("MathDoodle")
 
 def predict(img):
     st.image(img, use_column_width=True)
