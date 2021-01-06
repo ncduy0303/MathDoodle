@@ -71,5 +71,5 @@ def predict(self:Learner, item):
         if num2 == 0: return f'Division by zero!'
         ans = num1 / num2
         op = '/'
-        return f'{num1} {op} {num2} = {ans:.2f}'
+        if num1 % num2: return f'{num1} {op} {num2} = {ans:.1f}'
     return f'{num1} {op} {num2} = {ans}'
