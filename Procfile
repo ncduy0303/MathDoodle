@@ -1,1 +1,1 @@
-web: voila --port=$PORT --no-browser --enable_nbextensions=True Deployment_Clean.ipynb
+web: streamlit run --server.enableCORS false --server.port $PORT app.py
