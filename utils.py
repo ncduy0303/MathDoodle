@@ -52,7 +52,7 @@ def combine_acc(inp, num1_targ, num2_targ, op_targ, axis=-1):
 def multimodel_split(m): return L(m.encoder, nn.Sequential(m.num1, m.num2, m.op)).map(params)
 
 @patch
-def predict(self:Learner, item):
+def multimodel_predict(self:Learner, item):
     dl = self.dls.test_dl([item], num_workers=0)
     preds, _ = self.get_preds(dl=dl)
     num1 = self.dls.vocab[0][preds[0].argmax(dim=1)][0]
