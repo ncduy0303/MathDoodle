@@ -1,4 +1,4 @@
-from fastai.vision.all import load_learner, torch, PILImage
+from fastai.vision.all import *
 from utils import *
 from streamlit_drawable_canvas import st_canvas
 import streamlit as st
@@ -7,13 +7,13 @@ import time
 
 st.title("MathDoodle")
 
+download_url('https://math-doodle-models.s3-ap-southeast-1.amazonaws.com/number.pkl', './model.pkl')
+learn = load_learner('model.pkl')
+
 def predict(img):
     st.image(img, use_column_width=True)
     with st.spinner('Wait for it...'): time.sleep(3)
-
-    learn = load_learner('model.pkl')
     pred = learn.predict(img)
-    
     st.success(f"This is the answer to your expression: {pred}")
 
 
