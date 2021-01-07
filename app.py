@@ -5,27 +5,28 @@ import streamlit as st
 import os
 import time
 
-st.title("MathDoodle")
-
-download_url('https://math-doodle-models.s3-ap-southeast-1.amazonaws.com/number.pkl', './number.pkl')
-download_url('https://math-doodle-models.s3-ap-southeast-1.amazonaws.com/geometry.pkl', './geometry.pkl')
+download_models()
+st.set_page_config("MathDoodle", "🦈")
+st.title("MathDoodle 🦈")
 
 option_model = st.sidebar.radio('', ['Mathematical Expressions', 'Geometric Shapes'])
+
 if option_model == 'Mathematical Expressions':
     learn = load_learner('number.pkl')
 else:
     learn = load_learner('geometry.pkl')
 
-def predict(img, display_img):
-    st.image(display_img, use_column_width=True)
+def predict(img):
     with st.spinner('Wait for it...'): time.sleep(3)
     if option_model == 'Mathematical Expressions':
-        pred = learn.multimodel_predict(img)
-        st.success(f"This is the answer to your expression: {pred}")
+        num1, num2, op, pred = learn.multimodel_predict(img)
+        st.success(f"The answer to your expression is: {pred} 😼")
+        with st.spinner('Wait for a surprise 😸 ...'): time.sleep(3)
+        illustrate(num1.item(), num2.item(), op)
     else:
         pred, _, probs = learn.predict(img)
         prob = round(torch.max(probs).item() * 100, 2)    
-        st.success(f"This is a {pred} with the proability of {prob}%.")
+        st.success(f"This is a {pred} with proability of {prob}% 😼.")
 
 option_upload = st.sidebar.radio('', ['Choose a test image', 'Choose your own image', 'Draw your own image'])
 
@@ -35,14 +36,18 @@ if option_upload == 'Choose a test image':
     file_path = 'images/' + test_image
     img = PILImageBW.create(file_path)
     display_img = PILImage.create(file_path)
-    predict(img, display_img)
+    st.image(display_img, use_column_width=True)
+    if st.button('Predict'): predict(img)
+
 
 if option_upload == 'Choose your own image':
     uploaded_file = st.sidebar.file_uploader("Please upload an image", type="jpg")
     if uploaded_file is not None:
         img = PILImageBW.create(uploaded_file)
         display_img = PILImage.create(uploaded_file)
-        predict(img, display_img)
+        st.image(display_img, use_column_width=True)
+        if st.button('Predict'): predict(img)
+
 
 if option_upload == 'Draw your own image':
     # Specify canvas parameters in application
@@ -73,4 +78,4 @@ if option_upload == 'Draw your own image':
     if canvas_result.image_data is not None:
         display_img = canvas_result.image_data
         img = PILImageBW.create(display_img[:, :, 0].astype(np.uint8))
-        if st.button('Predict'): predict(img, display_img)
+        if st.button('Predict'): predict(img)

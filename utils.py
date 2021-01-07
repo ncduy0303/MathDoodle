@@ -1,5 +1,6 @@
 from fastai.vision.all import *
-
+import streamlit as st
+import time
 class MultiModel(Module):
     "A multi-head model given an 'encoder' and 'n' output features"
     def __init__(self, encoder, n):
@@ -71,5 +72,87 @@ def multimodel_predict(self:Learner, item):
         if num2 == 0: return f'Division by zero!'
         ans = num1 / num2
         op = '/'
-        if num1 % num2: return f'{num1} {op} {num2} = {ans:.1f}'
-    return f'{num1} {op} {num2} = {ans}'
+        if num1 % num2: return num1, num2, op, f'{num1} {op} {num2} = {ans:.1f}'
+        else: ans = (int) (num1 / num2)
+    return num1, num2, op, f'{num1} {op} {num2} = {ans}'
+
+def download_models():
+    download_url('https://math-doodle-models.s3-ap-southeast-1.amazonaws.com/number.pkl', './number.pkl')
+    download_url('https://math-doodle-models.s3-ap-southeast-1.amazonaws.com/geometry.pkl', './geometry.pkl')
+
+def illustrate(num1, num2, op):
+    # not working for non-positive values
+    if num1 < 0 or num2 < 0: 
+        st.error('Oops, no surprise 😿! Better luck next time 😹')
+        return
+
+    animation = 'shark.png'
+    limit = 50
+
+    if op == '+':
+        st.info('An animation to illustrate addition equation 🙀')
+        num1_cols = st.beta_columns(num1)
+        num2_cols = st.beta_columns(num2)
+        cnt = 0
+        for col in num1_cols:
+            time.sleep(0.2)
+            cnt += 1 
+            col.image(animation, width=limit)
+            col.title(f'{cnt}')
+        time.sleep(0.5)
+        for col in num2_cols: 
+            time.sleep(0.2)
+            cnt += 1 
+            col.image(animation, width=limit)
+            col.title(f'{cnt}')
+        st.success('Easy to understand now? 😻')
+        return
+
+    if op == '-' and num1 - num2 >= 0:
+        st.info('An animation to illustrate subtraction equation 🙀')
+        num1_cols = st.beta_columns(num1)
+        num2_cols = st.beta_columns(num2)
+        cnt = 0
+        for col in num1_cols:
+            time.sleep(0.2)
+            cnt += 1 
+            col.image(animation, width=limit)
+            col.title(f'{cnt}')
+        time.sleep(0.5)
+        for col in num2_cols: 
+            time.sleep(0.2)
+            cnt -= 1 
+            col.image(animation, width=limit)
+            col.title(f'{cnt}')
+        st.success('Easy to understand now? 😻')
+        return
+
+    if op == '*' and num1 > 0 and num2 > 0:
+        st.info('An animation to illustrate multiplication equation 🙀')
+        cols = st.beta_columns(num1)
+        cnt = 0
+        for i in range(num2):
+            for col in cols:
+                time.sleep(0.1)
+                cnt += 1 
+                col.image(animation, width=limit)
+                col.title(f'{cnt}')
+            time.sleep(0.3)
+        st.success('Easy to understand now? 😻')
+        return
+    
+    if op == '/' and num1 > 0 and num2 > 0 and num1 % num2 == 0:
+        st.info('An animation to illustrate division equation 🙀')
+        cols = st.beta_columns(num2)
+        cnt = 0
+        for i in range((int) (num1 / num2)):
+            for col in cols:
+                time.sleep(0.2)
+                cnt += 1 
+                col.image(animation, width=limit)
+                col.title(f'{cnt}')    
+            time.sleep(0.5)   
+        st.success('Easy to understand now? 😻')
+        return 
+    
+    st.error('Oops, no surprise 😿! Better luck next time 😹')
