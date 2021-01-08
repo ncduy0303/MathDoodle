@@ -76,30 +76,46 @@ def multimodel_predict(self:Learner, item):
         else: ans = (int) (num1 / num2)
     return num1, num2, op, f'{num1} {op} {num2} = {ans}'
 
+@st.cache()
 def download_models():
     download_url('https://math-doodle-models.s3-ap-southeast-1.amazonaws.com/number.pkl', './number.pkl')
     download_url('https://math-doodle-models.s3-ap-southeast-1.amazonaws.com/geometry.pkl', './geometry.pkl')
 
+def predict(img, option_model):
+    with st.spinner('Wait for it...'): time.sleep(3)
+    if option_model == 'Mathematical Expressions':
+        learn = load_learner('number.pkl')
+        num1, num2, op, pred = learn.multimodel_predict(img)
+        st.success(f"The answer to your expression is: {pred} 😼")
+        with st.spinner('Wait for a surprise 😸 ...'): time.sleep(3)
+        illustrate(num1.item(), num2.item(), op)
+    else:
+        learn = load_learner('geometry.pkl')
+        pred, _, probs = learn.predict(img)
+        prob = round(torch.max(probs).item() * 100, 2)    
+        st.success(f"This is a {pred} with a probability of {prob}% 😼.")
+
 def illustrate(num1, num2, op):
     # not working for non-positive values
-    if num1 < 0 or num2 < 0: 
+    if num1 <= 0 or num2 <= 0: 
         st.error('Oops, no surprise 😿! Better luck next time 😹')
         return
 
-    animation = 'shark.png'
+    animation = 'animations/shark.png'
+    animation2 = 'animations/shark_net.png'
     limit = 50
 
     if op == '+':
-        st.info('An animation to illustrate addition equation 🙀')
-        num1_cols = st.beta_columns(num1)
-        num2_cols = st.beta_columns(num2)
+        st.info('An animation to illustrate this addition equation 🙀')
         cnt = 0
+        num1_cols = st.beta_columns(num1)
         for col in num1_cols:
             time.sleep(0.2)
             cnt += 1 
             col.image(animation, width=limit)
             col.title(f'{cnt}')
         time.sleep(0.5)
+        num2_cols = st.beta_columns(num2)
         for col in num2_cols: 
             time.sleep(0.2)
             cnt += 1 
@@ -109,28 +125,28 @@ def illustrate(num1, num2, op):
         return
 
     if op == '-' and num1 - num2 >= 0:
-        st.info('An animation to illustrate subtraction equation 🙀')
-        num1_cols = st.beta_columns(num1)
-        num2_cols = st.beta_columns(num2)
+        st.info('An animation to illustrate this subtraction equation 🙀')
         cnt = 0
+        num1_cols = st.beta_columns(num1)
         for col in num1_cols:
             time.sleep(0.2)
             cnt += 1 
             col.image(animation, width=limit)
             col.title(f'{cnt}')
         time.sleep(0.5)
+        num2_cols = st.beta_columns(num2)
         for col in num2_cols: 
             time.sleep(0.2)
             cnt -= 1 
-            col.image(animation, width=limit)
+            col.image(animation2, width=limit)
             col.title(f'{cnt}')
         st.success('Easy to understand now? 😻')
         return
 
-    if op == '*' and num1 > 0 and num2 > 0:
-        st.info('An animation to illustrate multiplication equation 🙀')
-        cols = st.beta_columns(num1)
+    if op == '*':
+        st.info('An animation to illustrate this multiplication equation 🙀')
         cnt = 0
+        cols = st.beta_columns(num1)
         for i in range(num2):
             for col in cols:
                 time.sleep(0.1)
@@ -141,10 +157,10 @@ def illustrate(num1, num2, op):
         st.success('Easy to understand now? 😻')
         return
     
-    if op == '/' and num1 > 0 and num2 > 0 and num1 % num2 == 0:
-        st.info('An animation to illustrate division equation 🙀')
-        cols = st.beta_columns(num2)
+    if op == '/' and num1 % num2 == 0:
+        st.info('An animation to illustrate this division equation 🙀')
         cnt = 0
+        cols = st.beta_columns(num2)
         for i in range((int) (num1 / num2)):
             for col in cols:
                 time.sleep(0.2)

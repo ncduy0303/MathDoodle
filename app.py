@@ -5,31 +5,14 @@ import streamlit as st
 import os
 import time
 
-download_models()
 st.set_page_config("MathDoodle", "🦈")
 st.title("MathDoodle 🦈")
 
+download_models()
+
 option_model = st.sidebar.radio('', ['Mathematical Expressions', 'Geometric Shapes'])
 
-if option_model == 'Mathematical Expressions':
-    learn = load_learner('number.pkl')
-else:
-    learn = load_learner('geometry.pkl')
-
-def predict(img):
-    with st.spinner('Wait for it...'): time.sleep(3)
-    if option_model == 'Mathematical Expressions':
-        num1, num2, op, pred = learn.multimodel_predict(img)
-        st.success(f"The answer to your expression is: {pred} 😼")
-        with st.spinner('Wait for a surprise 😸 ...'): time.sleep(3)
-        illustrate(num1.item(), num2.item(), op)
-    else:
-        pred, _, probs = learn.predict(img)
-        prob = round(torch.max(probs).item() * 100, 2)    
-        st.success(f"This is a {pred} with proability of {prob}% 😼.")
-
 option_upload = st.sidebar.radio('', ['Choose a test image', 'Choose your own image', 'Draw your own image'])
-
 if option_upload == 'Choose a test image':
     test_images = os.listdir('images/')
     test_image = st.sidebar.selectbox('Please select a test image:', test_images)
@@ -37,7 +20,7 @@ if option_upload == 'Choose a test image':
     img = PILImageBW.create(file_path)
     display_img = PILImage.create(file_path)
     st.image(display_img, use_column_width=True)
-    if st.button('Predict'): predict(img)
+    if st.button('Predict'): predict(img, option_model)
 
 
 if option_upload == 'Choose your own image':
@@ -46,7 +29,7 @@ if option_upload == 'Choose your own image':
         img = PILImageBW.create(uploaded_file)
         display_img = PILImage.create(uploaded_file)
         st.image(display_img, use_column_width=True)
-        if st.button('Predict'): predict(img)
+        if st.button('Predict'): predict(img, option_model)
 
 
 if option_upload == 'Draw your own image':
@@ -78,4 +61,4 @@ if option_upload == 'Draw your own image':
     if canvas_result.image_data is not None:
         display_img = canvas_result.image_data
         img = PILImageBW.create(display_img[:, :, 0].astype(np.uint8))
-        if st.button('Predict'): predict(img)
+        if st.button('Predict'): predict(img, option_model)
