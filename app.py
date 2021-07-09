@@ -8,10 +8,6 @@ import time
 st.set_page_config("MathDoodle", "🦈")
 st.title("MathDoodle 🦈")
 
-download_models()
-
-option_model = st.sidebar.radio('', ['Mathematical Expressions', 'Geometric Shapes'])
-
 option_upload = st.sidebar.radio('', ['Choose a test image', 'Choose your own image', 'Draw your own image'])
 if option_upload == 'Choose a test image':
     test_images = os.listdir('images/')
@@ -20,7 +16,7 @@ if option_upload == 'Choose a test image':
     img = PILImageBW.create(file_path)
     display_img = PILImage.create(file_path)
     st.image(display_img, use_column_width=True)
-    if st.button('Predict'): predict(img, option_model)
+    if st.button('Predict'): predict(img)
 
 
 if option_upload == 'Choose your own image':
@@ -29,7 +25,7 @@ if option_upload == 'Choose your own image':
         img = PILImageBW.create(uploaded_file)
         display_img = PILImage.create(uploaded_file)
         st.image(display_img, use_column_width=True)
-        if st.button('Predict'): predict(img, option_model)
+        if st.button('Predict'): predict(img)
 
 
 if option_upload == 'Draw your own image':
@@ -48,7 +44,7 @@ if option_upload == 'Draw your own image':
         fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
         stroke_width=stroke_width,
         stroke_color=stroke_color,
-        background_color="" if bg_image else bg_color,
+        background_color=bg_color,
         background_image=Image.open(bg_image) if bg_image else None,
         update_streamlit=realtime_update,
         height=300,
@@ -61,4 +57,4 @@ if option_upload == 'Draw your own image':
     if canvas_result.image_data is not None:
         display_img = canvas_result.image_data
         img = PILImageBW.create(display_img[:, :, 0].astype(np.uint8))
-        if st.button('Predict'): predict(img, option_model)
+        if st.button('Predict'): predict(img)

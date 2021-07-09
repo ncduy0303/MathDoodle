@@ -72,28 +72,17 @@ def multimodel_predict(self:Learner, item):
         if num2 == 0: return f'Division by zero!'
         ans = num1 / num2
         op = '/'
-        if num1 % num2: return num1, num2, op, f'{num1} {op} {num2} = {ans:.1f}'
+        if num1 % num2: return num1, num2, op, f'{num1} {op} {num2} = {ans:.3f}'
         else: ans = (int) (num1 / num2)
     return num1, num2, op, f'{num1} {op} {num2} = {ans}'
 
-@st.cache()
-def download_models():
-    download_url('https://math-doodle-models.s3-ap-southeast-1.amazonaws.com/number.pkl', './number.pkl')
-    download_url('https://math-doodle-models.s3-ap-southeast-1.amazonaws.com/geometry.pkl', './geometry.pkl')
-
-def predict(img, option_model):
+def predict(img):
     with st.spinner('Wait for it...'): time.sleep(3)
-    if option_model == 'Mathematical Expressions':
-        learn = load_learner('number.pkl')
-        num1, num2, op, pred = learn.multimodel_predict(img)
-        st.success(f"The answer to your expression is: {pred} 😼")
-        with st.spinner('Wait for a surprise 😸 ...'): time.sleep(3)
-        illustrate(num1.item(), num2.item(), op)
-    else:
-        learn = load_learner('geometry.pkl')
-        pred, _, probs = learn.predict(img)
-        prob = round(torch.max(probs).item() * 100, 2)    
-        st.success(f"This is a {pred} with a probability of {prob}% 😼.")
+    learn = load_learner('models/number.pkl')
+    num1, num2, op, pred = learn.multimodel_predict(img)
+    st.success(f"The answer to your expression is: {pred} 😼")
+    with st.spinner('Wait for a surprise 😸 ...'): time.sleep(3)
+    illustrate(num1.item(), num2.item(), op)
 
 def illustrate(num1, num2, op):
     # not working for non-positive values
