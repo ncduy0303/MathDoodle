@@ -2,5 +2,5 @@
 - An educational and fun web application where children can doodle simple mathematical expressions and the deep learning model will show the answers with meaningful animation. 
 
 # Update
-- The website is not online as it costs money to host on AWS. It was deployed using Docker and AWS Elastic Beanstalk.
-- Feel free to clone and try it out locally. 
+- This website was initially deployed using Docker and AWS Elastic Beanstalk. 
+- I moved it to Streamlit Share to host it for free.
